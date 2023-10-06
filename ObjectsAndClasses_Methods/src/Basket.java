@@ -1,13 +1,14 @@
 public class Basket {
+    private static int totalCount = 0;
+    private static int totalCost = 0;
 
-    private static int count = 0;
     private String items = "";
     private int totalPrice = 0;
     private int limit;
 
     public Basket() {
         increaseCount(1);
-        items = "Список товаров:";
+        items = "List of products:";
         this.limit = 1000000;
     }
 
@@ -22,12 +23,34 @@ public class Basket {
         this.totalPrice = totalPrice;
     }
 
-    public static int getCount() {
-        return count;
+    public static int getTotalCount() {
+        return totalCount;
+    }
+
+    public static int getTotalCost() {
+        return totalCost;
     }
 
     public static void increaseCount(int count) {
-        Basket.count = Basket.count + count;
+        totalCount = totalCount + count;
+    }
+
+    public static void increaseCost(int cost) {
+        totalCost = totalCost + cost;
+    }
+
+    public static double calculateAveragePrice() {
+        if (totalCount == 0) {
+            return 0;
+        }
+        return (double) totalCost / totalCount;
+    }
+
+    public static double calculateAverageBasketCost(int numberOfBaskets) {
+        if (numberOfBaskets == 0) {
+            return 0;
+        }
+        return (double) totalCost / numberOfBaskets;
     }
 
     public void add(String name, int price) {
@@ -45,13 +68,15 @@ public class Basket {
         }
 
         if (error) {
-            System.out.println("Error occured :(");
+            System.out.println("Error occurred :(");
             return;
         }
 
         items = items + "\n" + name + " - " +
-            count + " шт. - " + price;
+                count + " шт. - " + price;
         totalPrice = totalPrice + count * price;
+        increaseCount(count);
+        increaseCost(count * price);
     }
 
     public void clear() {
@@ -70,7 +95,7 @@ public class Basket {
     public void print(String title) {
         System.out.println(title);
         if (items.isEmpty()) {
-            System.out.println("Корзина пуста");
+            System.out.println("Cart is empty");
         } else {
             System.out.println(items);
         }
