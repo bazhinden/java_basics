@@ -8,7 +8,7 @@ public class Basket {
 
     public Basket() {
         increaseCount(1);
-        items = "List of products:";
+        items = "Список продуктов:";
         this.limit = 1000000;
     }
 
@@ -68,12 +68,12 @@ public class Basket {
         }
 
         if (error) {
-            System.out.println("Error occurred :(");
+            System.out.println("Возникла ошибка :(");
             return;
         }
 
         items = items + "\n" + name + " - " +
-                count + " шт. - " + price;
+                count + " шт. - " + price + "р.";
         totalPrice = totalPrice + count * price;
         increaseCount(count);
         increaseCost(count * price);
@@ -95,7 +95,7 @@ public class Basket {
     public void print(String title) {
         System.out.println(title);
         if (items.isEmpty()) {
-            System.out.println("Cart is empty");
+            System.out.println("Корзина пуста!");
         } else {
             System.out.println(items);
         }
