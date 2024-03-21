@@ -2,7 +2,6 @@ import java.util.*;
 
 public class Company {
     private List<Employee> employees = new ArrayList<>();
-    private double income;
 
     public void hire(Employee employee) {
         employees.add(employee);
@@ -21,25 +20,14 @@ public class Company {
     }
 
     public List<Employee> getTopSalaryStaff(int count) {
-        List<Employee> sortedEmployees = new ArrayList<>(employees);
-        Collections.sort(sortedEmployees, new Comparator<Employee>() {
-            @Override
-            public int compare(Employee emp1, Employee emp2) {
-                return Double.compare(emp2.getMonthSalary(), emp1.getMonthSalary());
-            }
-        });
-        return sortedEmployees.subList(0, Math.min(count, sortedEmployees.size()));
+        Collections.sort(employees);
+        Collections.reverse(employees);
+        return employees.subList(0, Math.min(count, employees.size()));
     }
 
     public List<Employee> getLowestSalaryStaff(int count) {
-        List<Employee> sortedEmployees = new ArrayList<>(employees);
-        Collections.sort(sortedEmployees, new Comparator<Employee>() {
-            @Override
-            public int compare(Employee emp1, Employee emp2) {
-                return Double.compare(emp1.getMonthSalary(), emp2.getMonthSalary());
-            }
-        });
-        return sortedEmployees.subList(0, Math.min(count, sortedEmployees.size()));
+        Collections.sort(employees);
+        return employees.subList(0, Math.min(count, employees.size()));
     }
 
     public List<Employee> getEmployees() {
