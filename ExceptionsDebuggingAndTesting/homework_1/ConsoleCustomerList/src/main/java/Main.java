@@ -31,8 +31,10 @@ public class Main {
                     try {
                         executor.addCustomer(tokens[1]);
                         LOGGER.info(INPUT_HISTORY_MARKER, "Добавлен новый клиент");
-                    } catch (IllegalArgumentException e) {
-                        LOGGER.error(INVALID_STATIONS_MARKER, "Не удалось добавить нового клиента: {}", e.getMessage());
+                    } catch (IncorrectInputStringException | IncorrectPhoneNumberException |
+                             IncorrectEmailException e) {
+                        LOGGER.error(INVALID_STATIONS_MARKER, "Не удалось добавить нового клиента: {}",
+                                e.getMessage());
                         System.out.println(e.getMessage());
                     }
                     break;

@@ -32,15 +32,15 @@ public class CustomerStorage {
         try {
             String[] components = data.split("\\s+");
             if (components.length != 4) {
-                throw new IllegalArgumentException("Неправильное количество компонентов во входных данных");
+                throw new IncorrectInputStringException("Неправильное количество компонентов во входных данных");
             }
             String name = components[INDEX_NAME] + " " + components[INDEX_SURNAME];
             if (!validateEmail(components[INDEX_EMAIL])) {
-                throw new IllegalArgumentException("Неверный формат электронной почты");
+                throw new IncorrectEmailException("Неверный формат электронной почты");
             }
 
             if (!validatePhone(components[INDEX_PHONE])) {
-                throw new IllegalArgumentException("Неверный формат номера телефона");
+                throw new IncorrectPhoneNumberException("Неверный формат номера телефона");
             }
             storage.put(name, new Customer(name, components[INDEX_PHONE], components[INDEX_EMAIL]));
         } catch (IllegalArgumentException e) {
