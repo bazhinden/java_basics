@@ -24,6 +24,7 @@ public class Main {
 
         while (true) {
             String command = scanner.nextLine();
+            LOGGER.info(INPUT_HISTORY_MARKER, "User input: {}", command);
             String[] tokens = command.split("\\s+", 2);
 
             switch (tokens[0]) {
