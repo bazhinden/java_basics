@@ -38,7 +38,6 @@ public class CustomerStorage {
             if (!validateEmail(components[INDEX_EMAIL])) {
                 throw new IncorrectEmailException("Неверный формат электронной почты");
             }
-
             if (!validatePhone(components[INDEX_PHONE])) {
                 throw new IncorrectPhoneNumberException("Неверный формат номера телефона");
             }
