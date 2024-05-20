@@ -1,51 +1,44 @@
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Main {
+    public static int THREAD_NUMBER = 1;
+    public static int NEW_WIDTH = 1600;
+    public static String DST_FOLDER = "E:\\Skillbox\\java_basics\\Multithreading\\ImageResizer\\dstImages";
+    public static String SRC_FOLDER = "E:\\Skillbox\\java_basics\\Multithreading\\ImageResizer\\sourceImages";
+    public static long START = System.currentTimeMillis();
+    public static int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     public static void main(String[] args) {
-        String srcFolder = "/users/sortedmap/Desktop/src";
-        String dstFolder = "/users/sortedmap/Desktop/dst";
-
-        File srcDir = new File(srcFolder);
-
-        long start = System.currentTimeMillis();
-
+        File srcDir = new File(SRC_FOLDER);
         File[] files = srcDir.listFiles();
 
-        try {
-            for (File file : files) {
-                BufferedImage image = ImageIO.read(file);
-                if (image == null) {
-                    continue;
-                }
-
-                int newWidth = 300;
-                int newHeight = (int) Math.round(
-                    image.getHeight() / (image.getWidth() / (double) newWidth)
-                );
-                BufferedImage newImage = new BufferedImage(
-                    newWidth, newHeight, BufferedImage.TYPE_INT_RGB
-                );
-
-                int widthStep = image.getWidth() / newWidth;
-                int heightStep = image.getHeight() / newHeight;
-
-                for (int x = 0; x < newWidth; x++) {
-                    for (int y = 0; y < newHeight; y++) {
-                        int rgb = image.getRGB(x * widthStep, y * heightStep);
-                        newImage.setRGB(x, y, rgb);
-                    }
-                }
-
-                File newFile = new File(dstFolder + "/" + file.getName());
-                ImageIO.write(newImage, "jpg", newFile);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (files == null) {
+            System.err.println("Исходная папка пуста или не существует.");
+            return;
         }
 
-        System.out.println("Duration: " + (System.currentTimeMillis() - start));
+        File dstDir = new File(DST_FOLDER);
+        if (!dstDir.exists()) {
+            dstDir.mkdirs();
+        }
+
+        int filesPerThread = (int) Math.ceil((double) files.length / AVAILABLE_PROCESSORS);
+
+        for (int i = 0; i < AVAILABLE_PROCESSORS; i++) {
+            int start = i * filesPerThread;
+            int end = Math.min(start + filesPerThread, files.length);
+
+            if (start < end) {
+                File[] filesForThread = new File[end - start];
+                System.arraycopy(files, start, filesForThread, 0, end - start);
+                resizeMethod(filesForThread);
+            }
+        }
+    }
+
+    public static void resizeMethod(File[] files) {
+        ImageResizer imageResizer = new ImageResizer(files, NEW_WIDTH, DST_FOLDER, START, THREAD_NUMBER);
+        new Thread(imageResizer).start();
+        THREAD_NUMBER++;
     }
 }
