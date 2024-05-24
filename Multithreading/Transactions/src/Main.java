@@ -1,28 +1,43 @@
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Bank bank = new Bank();
-        bank.getAccounts().put("111111", new Account(100000));
-        bank.getAccounts().put("222222", new Account(50000));
-        ExecutorService executor = Executors.newFixedThreadPool(5);
-        for (int i = 0; i < 5; i++) {
-            executor.submit(() ->{
-                Account fromAccount = bank.getAccounts().get("111111");
-                Account toAccount = bank.getAccounts().get("222222");
-                fromAccount.setBlocked(false);
-                toAccount.setBlocked(false);
 
-                bank.transfer("111111", "222222", 60000);
-                System.out.println(bank.getSumAllAccounts());
-                System.out.println(bank.getBalance("222222"));
-                System.out.println(bank.getBalance("111111"));
-            });
+        bank.getAccounts().put("Account1", new Account(100000));
+        bank.getAccounts().put("Account2", new Account(100000));
+        bank.getAccounts().put("Account3", new Account(100000));
+        bank.getAccounts().put("Account4", new Account(100000));
+
+        long sumBeforeTransfer = bank.getSumAllAccounts();
+        System.out.println("Сумма до переводов: " + sumBeforeTransfer);
+
+        Thread thread1 = new Thread(() -> {
+            for (int i = 0; i < 10_000; i++) {
+                bank.transfer("Account1", "Account2", 1000);
+                bank.transfer("Account3", "Account4", 1000);
+            }
+        });
+
+        Thread thread2 = new Thread(() -> {
+            for (int i = 0; i < 10_000; i++) {
+                bank.transfer("Account2", "Account1", 1000);
+                bank.transfer("Account4", "Account3", 1000);
+            }
+        });
+
+        thread1.start();
+        thread2.start();
+
+        thread1.join();
+        thread2.join();
+
+        long sumAfterTransfer = bank.getSumAllAccounts();
+        System.out.println("Сумма после переводов: " + sumAfterTransfer);
+
+        if (sumBeforeTransfer == sumAfterTransfer) {
+            System.out.println("Суммы совпадают. Дедлоков нет.");
+        } else {
+            System.out.println("Суммы не совпадают. Есть ошибка в логике перевода.");
         }
-        executor.shutdown();
-        executor.awaitTermination(10, TimeUnit.SECONDS);
-        System.out.println("Main ends");
     }
 }

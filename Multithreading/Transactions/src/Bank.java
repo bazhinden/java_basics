@@ -22,14 +22,18 @@ public class Bank {
         if (fromAccount == null || toAccount == null) {
             throw new IllegalArgumentException("Недопустимый номер счета(ов)");
         }
-        synchronized (fromAccount) {
-            synchronized (toAccount) {
+        Account firstLock = fromAccount.compareTo(toAccount) > 0 ? toAccount : fromAccount;
+        Account secondLock = fromAccount.compareTo(toAccount) > 0 ? fromAccount : toAccount;
+
+        synchronized (firstLock) {
+            synchronized (secondLock) {
                 if (amount > 50000) {
                     try {
                         if (isFraud(fromAccountNum, toAccountNum, amount)) {
                             fromAccount.setBlocked(true);
                             toAccount.setBlocked(true);
                             System.out.println("Обнаружены мошеннические действия! Счета заблокированы!");
+                            return;
                         }
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
@@ -46,7 +50,6 @@ public class Bank {
                 }
             }
         }
-
     }
 
     public long getBalance(String accountNum) {
