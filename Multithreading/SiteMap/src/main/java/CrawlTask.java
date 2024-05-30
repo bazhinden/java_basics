@@ -39,10 +39,13 @@ public class CrawlTask extends RecursiveAction {
                             String childUrl = link.absUrl("href");
                             if (isValidUrl(childUrl) && !visitedUrls.contains(childUrl)) {
                                 CrawlTask task = new CrawlTask(childUrl, depth + 1, visitedUrls);
+                                task.fork();
                                 tasks.add(task);
                             }
                         }
-                        invokeAll(tasks);
+                        for(CrawlTask task : tasks) {
+                            task.join();
+                        }
                     }
                     saveUrlToFile(url, depth);
                 }
