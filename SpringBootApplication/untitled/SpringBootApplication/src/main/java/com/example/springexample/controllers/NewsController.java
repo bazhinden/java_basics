@@ -1,7 +1,7 @@
 package com.example.springexample.controllers;
 
 import com.example.springexample.dto.News;
-import com.example.springexample.services.NewsCRUDService;
+import com.example.springexample.services.CRUDService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +12,9 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/api/news/")
 public class NewsController {
+    private final CRUDService<News> newsService;
 
-    private final NewsCRUDService newsService;
-
-    public NewsController(NewsCRUDService newsService) {
+    public NewsController(CRUDService<News> newsService) {
         this.newsService = newsService;
     }
 
