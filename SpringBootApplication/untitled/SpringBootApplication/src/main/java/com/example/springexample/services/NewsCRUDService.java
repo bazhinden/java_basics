@@ -1,57 +1,97 @@
 package com.example.springexample.services;
 
-import com.example.springexample.dto.News;
+import com.example.springexample.dto.NewsDTO;
+import com.example.springexample.entity.Category;
+import com.example.springexample.entity.News;
+import com.example.springexample.repositories.NewsRepository;
+import com.example.springexample.repositories.CategoryRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
-public class NewsCRUDService implements CRUDService<News> {
-    private final ConcurrentHashMap<Long, News> storage = new ConcurrentHashMap<>();
+@Slf4j
+public class NewsCRUDService implements CRUDService<NewsDTO> {
+
+    private final NewsRepository newsRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
-    public News getById(Long id) {
-        System.out.println("Get by ID: " + id);
-        return storage.get(id);
+    public NewsDTO getById(Long id) {
+        log.info("Get" + id);
+        News news = newsRepository.findById(id).orElseThrow();
+        return mapToDto(news);
     }
 
     @Override
-    public Collection<News> getAll() {
-        System.out.println("Get all");
-        return storage.values();
+    public Collection<NewsDTO> getAll() {
+        log.info("GetAll");
+        return newsRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void create(News item) {
-        System.out.println("Create");
-        Long nextID = storage.isEmpty() ? 1L : Collections.max(storage.keySet()) + 1;
-        item.setId(nextID);
-        if (item.getDate() == null) {
-            item.setDate(Instant.now());
-        }
-        storage.put(nextID, item);
+    public void create(NewsDTO newsDTO) {
+        log.info("Create " + newsDTO.getTitle());
+        News news = mapToEntity(newsDTO);
+        newsRepository.save(news);
     }
 
     @Override
-    public void update(Long id, News item) {
-        System.out.println("Update " + id);
-        News existingNews = storage.get(id);
-        if (existingNews == null) {
-            return;
-        }
-        item.setId(id);
-        if (item.getDate() == null) {
-            item.setDate(existingNews.getDate());
-        }
-        storage.put(id, item);
+    public void update(NewsDTO newsDTO) {
+        log.info("Update " + newsDTO.getId());
+        News news = mapToEntity(newsDTO);
+        newsRepository.save(news);
     }
+
+
 
     @Override
     public void deleteById(Long id) {
-        System.out.println("Delete " + id);
-        storage.remove(id);
+        log.info("Delete " + id);
+        newsRepository.deleteById(id);
     }
+
+    public NewsDTO mapToDto(News news) {
+        NewsDTO newsDTO = new NewsDTO();
+        newsDTO.setId(news.getId());
+        newsDTO.setTitle(news.getTitle());
+        newsDTO.setText(news.getText());
+        newsDTO.setDate(news.getDate());
+        newsDTO.setCategoryId(news.getCategory() != null ? news.getCategory().getId() : null);
+        return newsDTO;
+    }
+
+    public News mapToEntity(NewsDTO newsDTO) {
+        News news = new News();
+        news.setId(newsDTO.getId());
+        news.setTitle(newsDTO.getTitle());
+        news.setText(newsDTO.getText());
+        news.setDate(newsDTO.getDate());
+
+        Long categoryId = newsDTO.getCategoryId();
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Category not found for id: " + categoryId));
+        news.setCategory(category);
+
+        return news;
+    }
+
+    public Collection<NewsDTO> getByCategoryId(Long categoryId) {
+        log.info("Get news by category ID: " + categoryId);
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Category not found for id: " + categoryId));
+        return category.getNews()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
 }

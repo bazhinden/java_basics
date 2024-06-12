@@ -1,7 +1,5 @@
 package com.example.springexample.services;
 
-import com.example.springexample.dto.News;
-
 import java.util.Collection;
 
 public interface CRUDService<T> {
@@ -11,7 +9,7 @@ public interface CRUDService<T> {
 
     void create(T item);
 
-    void update(Long id, News item);
+    void update(T item);
 
     void deleteById(Long id);
 }
