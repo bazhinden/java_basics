@@ -2,74 +2,52 @@ package com.example.springexample.controllers;
 
 import com.example.springexample.dto.NewsDTO;
 import com.example.springexample.services.NewsCRUDService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/news")
+@RequiredArgsConstructor
+@RequestMapping("/news")
 public class NewsController {
 
     private final NewsCRUDService newsService;
 
-    public NewsController(NewsCRUDService newsService) {
-        this.newsService = newsService;
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        NewsDTO news = newsService.getById(id);
-        if (news == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Collections.singletonMap("message", "Новость с ID " + id + " не найдена.")
-            );
-        }
-        return ResponseEntity.ok(news);
+    public NewsDTO getNewsById(@PathVariable Long id) {
+        return newsService.getById(id);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<NewsDTO>> getAll() {
-        Collection<NewsDTO> newsCollection = newsService.getAll();
-        return ResponseEntity.ok(newsCollection);
-    }
-
-    @PostMapping
-    public ResponseEntity<NewsDTO> create(@RequestBody NewsDTO news) {
-        newsService.create(news);
-        return ResponseEntity.status(HttpStatus.CREATED).body(news);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody NewsDTO news) {
-        NewsDTO existingNews = newsService.getById(id);
-        if (existingNews == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Collections.singletonMap("message", "Новость с ID " + id + " не найдена.")
-            );
-        }
-        news.setId(id);
-        newsService.update(news);
-        return ResponseEntity.ok(news);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Long id) {
-        NewsDTO existingNews = newsService.getById(id);
-        if (existingNews == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Collections.singletonMap("message", "Новость с ID " + id + " не найдена.")
-            );
-        }
-        newsService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public Collection<NewsDTO> getAllNews() {
+        return newsService.getAll();
     }
 
     @GetMapping("/category/{id}")
-    public ResponseEntity<Collection<NewsDTO>> getByCategoryId(@PathVariable Long id) {
-        Collection<NewsDTO> newsCollection = newsService.getByCategoryId(id);
-        return ResponseEntity.ok(newsCollection);
+    public ResponseEntity<List<NewsDTO>> getNewsByCategoryId(@PathVariable Long id) {
+        List<NewsDTO> newsDTOList = newsService.getNewsByCategoryId(id);
+        return ResponseEntity.ok(newsDTOList);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createNews(@RequestBody NewsDTO newsDTO) {
+        newsService.create(newsDTO);
+    }
+
+    @PutMapping
+    public void updateNews(@RequestBody NewsDTO newsDTO) {
+        newsService.update(newsDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteByIdNews(@PathVariable Long id) {
+        newsService.deleteById(id);
     }
 }
+
