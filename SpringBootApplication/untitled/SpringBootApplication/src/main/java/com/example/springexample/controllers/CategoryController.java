@@ -1,6 +1,7 @@
 package com.example.springexample.controllers;
 
 import com.example.springexample.dto.CategoryDTO;
+import com.example.springexample.services.CRUDService;
 import com.example.springexample.services.CategoryCRUDService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import java.util.Collection;
 @RequestMapping("/category")
 public class CategoryController {
 
-    private final CategoryCRUDService categoryService;
+    private final CRUDService<CategoryDTO> categoryService;
     @GetMapping("/{id}")
     public CategoryDTO getByIdCategory(@PathVariable Long id) {
         return categoryService.getById(id);

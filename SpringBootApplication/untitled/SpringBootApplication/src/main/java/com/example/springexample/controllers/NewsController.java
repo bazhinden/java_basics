@@ -1,6 +1,7 @@
 package com.example.springexample.controllers;
 
 import com.example.springexample.dto.NewsDTO;
+import com.example.springexample.services.CRUDService;
 import com.example.springexample.services.NewsCRUDService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import java.util.List;
 @RequestMapping("/news")
 public class NewsController {
 
-    private final NewsCRUDService newsService;
+    private final CRUDService<NewsDTO> newsService;
 
     @GetMapping("/{id}")
     public NewsDTO getNewsById(@PathVariable Long id) {
