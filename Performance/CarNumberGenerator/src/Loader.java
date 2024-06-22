@@ -1,4 +1,3 @@
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -10,82 +9,55 @@ public class Loader {
     public static void main(String[] args) throws Exception {
         long start = System.currentTimeMillis();
 
-        ExecutorService service = Executors.newFixedThreadPool(4);
+        int numThreads = 199;
+        ExecutorService service = Executors.newFixedThreadPool(numThreads);
 
-        service.execute(() -> {
-            try {
-                generateNumbers(1, 50, "res/n1.txt");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
 
-        service.execute(() -> {
-            try {
-                generateNumbers(51, 100, "res/n2.txt");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        service.execute(() -> {
-            try {
-                generateNumbers(101, 150, "res/n3.txt");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        service.execute(() -> {
-            try {
-                generateNumbers(151, 200, "res/n4.txt");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        for (int regionCode = 1; regionCode <= 199; regionCode++) {
+            final int region = regionCode;
+            service.execute(() -> {
+                try {
+                    generateNumbers(region, "res/" + region + ".txt");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
 
         service.shutdown();
-        try {
-            if (!service.awaitTermination(1, TimeUnit.HOURS)) {
-                System.out.println("Не удалось завершить выполнение задач в течении заданного времени.");
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        service.awaitTermination(1, TimeUnit.HOURS);
+        
         System.out.println((System.currentTimeMillis() - start) + " ms");
     }
 
-    public static void generateNumbers(int regionStart, int regionEnd, String fileName) throws IOException {
-        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(fileName))) {
+    public static void generateNumbers(int regionCode, String fileName) throws IOException {
+        try (FileOutputStream writer = new FileOutputStream(fileName)) {
             char letters[] = {'У', 'К', 'Е', 'Н', 'Х', 'В', 'А', 'Р', 'О', 'С', 'М', 'Т'};
             StringBuilder sb = new StringBuilder();
             for (int number = 1; number < 1000; number++) {
-                for (int regionCode = regionStart; regionCode <= regionEnd; regionCode++) {
-                    for (char firstLetter : letters) {
-                        for (char secondLetter : letters) {
-                            for (char thirdLetter : letters) {
-                                sb.append(firstLetter)
-                                        .append(padNumber(number, 3))
-                                        .append(secondLetter)
-                                        .append(thirdLetter)
-                                        .append(padNumber(regionCode, 2))
-                                        .append("\n");
-                            }
+                for (char firstLetter : letters) {
+                    for (char secondLetter : letters) {
+                        for (char thirdLetter : letters) {
+                            sb.append(firstLetter)
+                                    .append(padNumber(number, 3))
+                                    .append(secondLetter)
+                                    .append(thirdLetter)
+                                    .append(padNumber(regionCode, 2))
+                                    .append("\n");
                         }
                     }
-                    writer.write(sb.toString().getBytes());
-                    sb.setLength(0);
                 }
             }
+            writer.write(sb.toString().getBytes());
         }
     }
 
     private static String padNumber(int number, int numberLength) {
-        StringBuilder numberStr = new StringBuilder(Integer.toString(number));
+        String numberStr = Integer.toString(number);
         while (numberStr.length() < numberLength) {
-            numberStr.insert(0, '0');
+            numberStr = '0' + numberStr;
         }
-        return numberStr.toString();
+        return numberStr;
     }
 }
 
