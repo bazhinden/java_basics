@@ -10,11 +10,11 @@ public class Loader {
     public static void main(String[] args) throws Exception {
         long start = System.currentTimeMillis();
 
-        ExecutorService service = Executors.newFixedThreadPool(2);
+        ExecutorService service = Executors.newFixedThreadPool(4);
 
         service.execute(() -> {
             try {
-                generateNumbers(1, 100, "res/n1.txt");
+                generateNumbers(1, 50, "res/n1.txt");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -22,7 +22,23 @@ public class Loader {
 
         service.execute(() -> {
             try {
-                generateNumbers(101, 200, "res/n2.txt");
+                generateNumbers(51, 100, "res/n2.txt");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        service.execute(() -> {
+            try {
+                generateNumbers(101, 150, "res/n3.txt");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        service.execute(() -> {
+            try {
+                generateNumbers(151, 200, "res/n4.txt");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -42,17 +58,23 @@ public class Loader {
     public static void generateNumbers(int regionStart, int regionEnd, String fileName) throws IOException {
         try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(fileName))) {
             char letters[] = {'У', 'К', 'Е', 'Н', 'Х', 'В', 'А', 'Р', 'О', 'С', 'М', 'Т'};
+            StringBuilder sb = new StringBuilder();
             for (int number = 1; number < 1000; number++) {
-                int regionCode = 199;
-                for (char firstLetter : letters) {
-                    for (char secondLetter : letters) {
-                        for (char thirdLetter : letters) {
-                            String carNumber = firstLetter + padNumber(number, 3) +
-                                    secondLetter + thirdLetter + padNumber(regionCode, 2);
-                            writer.write(carNumber.getBytes());
-                            writer.write('\n');
+                for (int regionCode = regionStart; regionCode <= regionEnd; regionCode++) {
+                    for (char firstLetter : letters) {
+                        for (char secondLetter : letters) {
+                            for (char thirdLetter : letters) {
+                                sb.append(firstLetter)
+                                        .append(padNumber(number, 3))
+                                        .append(secondLetter)
+                                        .append(thirdLetter)
+                                        .append(padNumber(regionCode, 2))
+                                        .append("\n");
+                            }
                         }
                     }
+                    writer.write(sb.toString().getBytes());
+                    sb.setLength(0);
                 }
             }
         }
