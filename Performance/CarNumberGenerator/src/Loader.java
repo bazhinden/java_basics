@@ -1,3 +1,4 @@
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +32,7 @@ public class Loader {
     }
 
     public static void generateNumbers(int regionCode, String fileName) throws IOException {
-        try (FileOutputStream writer = new FileOutputStream(fileName)) {
+        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(fileName))) {
             char letters[] = {'У', 'К', 'Е', 'Н', 'Х', 'В', 'А', 'Р', 'О', 'С', 'М', 'Т'};
             StringBuilder sb = new StringBuilder();
             for (int number = 1; number < 1000; number++) {
@@ -49,6 +50,7 @@ public class Loader {
                 }
             }
             writer.write(sb.toString().getBytes());
+            sb.setLength(0);
         }
     }
 
